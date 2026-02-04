@@ -113,7 +113,7 @@ namespace shop.Controllers
                 .OrderByDescending(m => m.MaMh)
                 .ToListAsync();
 
-            ViewBag.PageTitle = "Trang chủ – ABC Mobile";
+            ViewBag.PageTitle = "Trang chủ – SmartStore";
             ViewBag.ShowBanner = true;
 
             return View(items); // Views/Customer/Home.cshtml
@@ -861,3 +861,4 @@ namespace shop.Controllers
 
     }
 }
+
