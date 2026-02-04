@@ -1,0 +1,93 @@
+﻿@model IEnumerable<shop.Models.Mathang>
+@using System
+
+<div class="row gx-3 gy-4">
+    @foreach (var item in Model)
+    {
+        int discount = 0;
+
+        if (item.GiaGoc.HasValue && item.GiaBan.HasValue && item.GiaGoc > item.GiaBan)
+        {
+            double goc = Convert.ToDouble(item.GiaGoc.Value);
+            double ban = Convert.ToDouble(item.GiaBan.Value);
+
+            discount = (int)Math.Round((goc - ban) * 100 / goc);
+        }
+
+        <div class="col-6 col-md-4 col-lg-3">
+            <div class="product-card shadow-sm rounded-3 h-100 d-flex flex-column">
+
+                <a asp-controller="Customer"
+                   asp-action="Details"
+                   asp-route-id="@item.MaMh"
+                   class="text-decoration-none text-dark flex-grow-1 d-flex flex-column">
+
+                    <div class="position-relative text-center p-2">
+                        <img class="img-fluid product-img"
+                             src="~/images/products/@item.HinhAnh"
+                             alt="@item.Ten" />
+
+                        @if (discount > 0)
+                        {
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2">
+                                -@discount%
+                            </span>
+                        }
+
+                        @if (item.LuotMua > 50)
+                        {
+                            <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">
+                                Bán chạy
+                            </span>
+                        }
+                    </div>
+
+                    <div class="px-2 pb-2 flex-grow-1">
+                        <div class="fw-semibold text-truncate-2 mb-1">@item.Ten</div>
+
+                        @if (!string.IsNullOrWhiteSpace(item.MoTa))
+                        {
+                            <div class="small text-muted text-truncate-2 mb-2">@item.MoTa</div>
+                        }
+
+                        <div class="mb-1">
+                            @if (discount > 0)
+                            {
+                                <span class="text-muted text-decoration-line-through small me-1">
+                                    @string.Format("{0:N0} đ", item.GiaGoc)
+                                </span>
+                            }
+                            <span class="text-danger fw-bold">
+                                @string.Format("{0:N0} đ", item.GiaBan)
+                            </span>
+                        </div>
+
+                        <div class="small text-secondary">
+                            <i class="bi bi-shield-check"></i> BH 12 tháng<br />
+                            <i class="bi bi-credit-card"></i> Trả góp 0%<br />
+                            <i class="bi bi-people"></i> Đã bán: @item.LuotMua
+                        </div>
+                    </div>
+                </a>
+
+                <div class="p-2 pt-0 border-top">
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-danger btn-sm flex-fill"
+                           asp-controller="Customer"
+                           asp-action="AddToCart"
+                           asp-route-id="@item.MaMh">
+                            Mua ngay
+                        </a>
+                        <a class="btn btn-outline-secondary btn-sm flex-fill"
+                           asp-controller="Customer"
+                           asp-action="Details"
+                           asp-route-id="@item.MaMh">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>

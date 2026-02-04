@@ -1,0 +1,90 @@
+﻿@model shop.Models.Danhmuc
+@using Microsoft.EntityFrameworkCore
+@inject shop.Data.ApplicationDbContext Db
+
+@{
+    ViewData["Title"] = "Xóa danh mục";
+
+    // đếm số sản phẩm đang dùng danh mục này
+    int productCount = Db.Mathangs.Count(m => m.MaDm == Model.MaDm);
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            <!-- Cảnh báo -->
+            <div class="alert @(productCount > 0 ? "alert-danger" : "alert-warning") d-flex align-items-center" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+
+                @if (productCount > 0)
+                {
+                    <div>
+                        <strong>Không thể xóa danh mục!</strong><br />
+                        Danh mục <strong>@Model.Ten</strong> hiện đang có
+                        <strong>@productCount sản phẩm</strong> sử dụng.
+                        <br />
+                        Hãy xóa hoặc chuyển danh mục của các sản phẩm trước.
+                    </div>
+                }
+                else
+                {
+                    <div>
+                        Bạn có chắc chắn muốn <strong>xóa danh mục này</strong>?<br />
+                        Thao tác này không thể hoàn tác.
+                    </div>
+                }
+            </div>
+
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-folder-x"></i> Xóa danh mục
+                </div>
+
+                <div class="card-body">
+
+                    <h5 class="fw-semibold mb-3">Thông tin danh mục</h5>
+
+                    <div class="mb-2">
+                        <strong>Mã danh mục:</strong> @Model.MaDm
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Tên danh mục:</strong>
+                        <span class="text-primary">@Model.Ten</span>
+                    </div>
+
+                    @if (productCount > 0)
+                    {
+                        <!-- không cho xóa -->
+                        <div class="alert alert-info small">
+                            Bạn phải xử lý <strong>@productCount sản phẩm</strong> trước khi xóa danh mục này.
+                        </div>
+
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Quay lại
+                        </a>
+                    }
+                    else
+                    {
+                        <!-- cho phép xóa -->
+                        <form asp-action="Delete" method="post" class="d-flex justify-content-between">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" asp-for="MaDm" />
+
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Quay lại
+                            </a>
+
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash3"></i> Xóa danh mục
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

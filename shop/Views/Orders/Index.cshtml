@@ -1,0 +1,130 @@
+﻿@model IEnumerable<shop.Models.Hoadon>
+
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    int status = ViewBag.Status ?? 0;
+
+    string Badge(int? s) => s switch
+    {
+        0 => "badge bg-warning text-dark",
+        1 => "badge bg-primary",
+        2 => "badge bg-success",
+        3 => "badge bg-secondary",
+        _ => "badge bg-light text-dark"
+    };
+
+    string StatusText(int? s) => s switch
+    {
+        0 => "Chờ duyệt",
+        1 => "Đã duyệt",
+        2 => "Đã giao",
+        3 => "Đã hủy",
+        _ => "Không rõ"
+    };
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="fw-bold mb-0">Quản lý đơn hàng</h4>
+        <div class="small text-muted">Có @Model.Count() đơn</div>
+    </div>
+
+    <div class="btn-group">
+        <a asp-action="Index" asp-route-status="0" class="btn btn-outline-secondary @(status == 0 ? "active" : "")">Chờ duyệt</a>
+        <a asp-action="Index" asp-route-status="1" class="btn btn-outline-secondary @(status == 1 ? "active" : "")">Đã duyệt</a>
+        <a asp-action="Index" asp-route-status="2" class="btn btn-outline-secondary @(status == 2 ? "active" : "")">Đã giao</a>
+        <a asp-action="Index" asp-route-status="3" class="btn btn-outline-secondary @(status == 3 ? "active" : "")">Đã hủy</a>
+        <a asp-action="Index" asp-route-status="-1" class="btn btn-outline-secondary @(status == -1 ? "active" : "")">Tất cả</a>
+    </div>
+</div>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã HĐ</th>
+                        <th>Ngày đặt</th>
+                        <th>Khách hàng</th>
+                        <th class="text-end">Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        <th>QL duyệt</th>
+                        <th class="text-end">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var hd in Model)
+                    {
+                        <tr>
+                            <td>#@hd.MaHd</td>
+                            <td>@(hd.Ngay?.ToString("dd/MM/yyyy HH:mm"))</td>
+                            <td>@hd.MaKhNavigation?.Ten</td>
+                            <td class="text-end">@String.Format("{0:N0} đ", hd.TongTien ?? 0)</td>
+                            <td>
+                                <span class="@Badge(hd.TrangThai)">
+                                    @StatusText(hd.TrangThai)
+                                </span>
+                            </td>
+                            <td>@hd.MaNvDuyetNavigation?.Ten</td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@hd.MaHd"
+                                   class="btn btn-sm btn-outline-info">
+                                    Chi tiết
+                                </a>
+
+                                @if (hd.TrangThai == 0)
+                                {
+                                    <form asp-action="Approve" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@hd.MaHd" />
+                                        <button type="submit" class="btn btn-sm btn-success">
+                                            Duyệt
+                                        </button>
+                                    </form>
+
+                                    <form asp-action="Cancel" method="post" class="d-inline ms-1">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@hd.MaHd" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            Hủy
+                                        </button>
+                                    </form>
+                                }
+                                else if (hd.TrangThai == 1)
+                                {
+                                    <!-- Đánh dấu đã giao thành công -->
+                                    <form asp-action="Complete" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@hd.MaHd" />
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            Đã giao
+                                        </button>
+                                    </form>
+
+                                    <!-- Hủy đơn sau khi đã duyệt (giao không thành công) -->
+                                    <form asp-action="Cancel" method="post" class="d-inline ms-1">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@hd.MaHd" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            Hủy (giao lỗi)
+                                        </button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

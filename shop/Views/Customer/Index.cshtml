@@ -1,0 +1,192 @@
+﻿@model IEnumerable<shop.Models.Mathang>
+@using System
+
+@{
+    ViewData["Title"] = ViewBag.PageTitle ?? "Sản phẩm";
+
+    bool showBanner = ViewBag.ShowBanner is bool b && b;
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalItems = ViewBag.TotalItems ?? 0;
+    int pageSize = ViewBag.PageSize ?? 12;
+    int totalPages = (int)Math.Ceiling(totalItems * 1.0 / pageSize);
+
+    string sort = ViewBag.Sort as string ?? "newest";
+
+    string actionName = (ViewContext.RouteData.Values["action"] ?? "Phones").ToString();
+    int? categoryId = ViewBag.CategoryId as int?;
+    string keyword = ViewBag.Keyword as string;
+    int? minPrice = ViewBag.MinPrice as int?;
+    int? maxPrice = ViewBag.MaxPrice as int?;
+}
+
+@if (showBanner)
+{
+    <div class="mb-4">
+        <img src="~/images/carousel/banner-main.jpg"
+             class="img-fluid w-100 rounded-3 shadow-sm"
+             alt="Banner" />
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0">@ViewData["Title"]</h4>
+
+    <div class="dropdown">
+        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                data-bs-toggle="dropdown">
+            Sắp xếp theo giá
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+                <a class="dropdown-item"
+                   asp-action="@actionName"
+                   asp-route-page="1"
+                   asp-route-sort="price_asc"
+                   asp-route-id="@(actionName == "ByCategory" ? categoryId : null)"
+                   asp-route-keyword="@(actionName == "Search" ? keyword : null)"
+                   asp-route-min="@(actionName == "FilterPrice" ? minPrice : null)"
+                   asp-route-max="@(actionName == "FilterPrice" ? maxPrice : null)">
+                    Giá tăng dần
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item"
+                   asp-action="@actionName"
+                   asp-route-page="1"
+                   asp-route-sort="price_desc"
+                   asp-route-id="@(actionName == "ByCategory" ? categoryId : null)"
+                   asp-route-keyword="@(actionName == "Search" ? keyword : null)"
+                   asp-route-min="@(actionName == "FilterPrice" ? minPrice : null)"
+                   asp-route-max="@(actionName == "FilterPrice" ? maxPrice : null)">
+                    Giá giảm dần
+                </a>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
+            <li>
+                <a class="dropdown-item"
+                   asp-action="@actionName"
+                   asp-route-page="1"
+                   asp-route-sort="newest"
+                   asp-route-id="@(actionName == "ByCategory" ? categoryId : null)"
+                   asp-route-keyword="@(actionName == "Search" ? keyword : null)"
+                   asp-route-min="@(actionName == "FilterPrice" ? minPrice : null)"
+                   asp-route-max="@(actionName == "FilterPrice" ? maxPrice : null)">
+                    Mới nhất
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Grid sản phẩm -->
+<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+    @foreach (var item in Model)
+    {
+        var giaGoc = item.GiaGoc ?? 0;
+        var giaBan = item.GiaBan ?? 0;
+        var giam = giaGoc - giaBan;
+        int percent = (giaGoc > 0 && giaBan < giaGoc)
+        ? (int)Math.Round(100.0 * giam / giaGoc)
+        : 0;
+
+        string img = Url.Content("~/images/products/" + (item.HinhAnh ?? "no-image.jpg"));
+        string shortDesc = !string.IsNullOrEmpty(item.MoTa) && item.MoTa!.Length > 90
+        ? item.MoTa.Substring(0, 90) + "..."
+        : (item.MoTa ?? "");
+        <div class="col">
+            <div class="card h-100 shadow-sm border-0">
+                <a asp-controller="Customer"
+                   asp-action="Details"
+                   asp-route-id="@item.MaMh"
+                   class="text-decoration-none text-dark">
+                    <div class="position-relative">
+                        <img src="@img"
+                             class="card-img-top"
+                             alt="@item.Ten"
+                             style="object-fit: cover; height: 220px;" />
+
+                        @if (percent > 0)
+                        {
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2">
+                                -@percent%
+                            </span>
+                        }
+                    </div>
+
+                    <div class="card-body pb-2">
+                        <h6 class="card-title fw-semibold text-truncate" title="@item.Ten">
+                            @item.Ten
+                        </h6>
+                        @if (!string.IsNullOrEmpty(shortDesc))
+                        {
+                            <p class="card-text small text-muted mb-1">
+                                @shortDesc
+                            </p>
+                        }
+                        <div class="mb-1">
+                            <span class="fw-bold text-danger">
+                                @String.Format("{0:N0} đ", giaBan)
+                            </span>
+                        </div>
+                        @if (giaGoc > giaBan)
+                        {
+                            <div class="small text-muted text-decoration-line-through">
+                                @String.Format("{0:N0} đ", giaGoc)
+                            </div>
+                        }
+                    </div>
+                </a>
+
+                <div class="card-footer bg-white border-0 pb-3 px-3">
+                    <div class="d-flex gap-2">
+                        <!-- MUA NGAY: POST AddToCart -->
+                        <form asp-controller="Customer"
+                              asp-action="AddToCart"
+                              method="post"
+                              class="flex-fill">
+                            <input type="hidden" name="id" value="@item.MaMh" />
+                            <input type="hidden" name="quantity" value="1" />
+                            <button type="submit" class="btn btn-danger w-100 btn-sm">
+                                Mua ngay
+                            </button>
+                        </form>
+
+                        <!-- XEM CHI TIẾT -->
+                        <a asp-controller="Customer"
+                           asp-action="Details"
+                           asp-route-id="@item.MaMh"
+                           class="btn btn-outline-secondary btn-sm flex-fill">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Nút Xem thêm / phân trang -->
+@if (currentPage < totalPages)
+{
+    <div class="text-center my-4">
+        <a class="btn btn-outline-warning px-5"
+           asp-action="@actionName"
+           asp-route-page="@(currentPage + 1)"
+           asp-route-sort="@sort"
+           asp-route-id="@(actionName == "ByCategory" ? categoryId : null)"
+           asp-route-keyword="@(actionName == "Search" ? keyword : null)"
+           asp-route-min="@(actionName == "FilterPrice" ? minPrice : null)"
+           asp-route-max="@(actionName == "FilterPrice" ? maxPrice : null)">
+            Xem thêm
+        </a>
+        <div class="small text-muted mt-2">Trang @currentPage / @totalPages</div>
+    </div>
+}
+else if (totalPages > 1)
+{
+    <div class="text-center my-3 small text-muted">
+        Bạn đang ở trang cuối (@currentPage / @totalPages)
+    </div>
+}

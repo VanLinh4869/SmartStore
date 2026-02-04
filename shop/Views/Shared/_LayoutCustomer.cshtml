@@ -1,0 +1,328 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject shop.Data.ApplicationDbContext Db
+@using shop.Models
+
+@{
+    int? customerId = Context.Session.GetInt32("CustomerId");
+    int? adminId = Context.Session.GetInt32("AdminId");
+    string adminRole = Context.Session.GetString("AdminRole");
+
+    bool isAdmin = adminId.HasValue;
+    bool isManager = isAdmin && adminRole == "Quản lý";
+
+    bool isStaff = isAdmin && !isManager;
+
+    bool isLoggedIn = isAdmin || customerId.HasValue;
+
+    string userName = "Tài khoản";
+    if (isAdmin)
+    {
+        var ad = Db.Nhanviens.Find(adminId.Value);
+        userName = ad?.Ten ?? "Admin";
+    }
+    else if (customerId.HasValue)
+    {
+        var customerInfo = Db.Khachhangs.Find(customerId.Value);
+        userName = customerInfo?.Ten ?? "Khách";
+    }
+
+    int cartCount = ViewBag.CartCount ?? 0;
+    string pageTitle = ViewBag.PageTitle ?? "SmartStore – Hệ Thống Kinh Doanh SmartPhone";
+}
+
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>@pageTitle</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+
+<body>
+
+    <!-- ===== HEADER TẦNG 1 (VÀNG) ===== -->
+    <header class="mc-header">
+        <div class="container py-2">
+            <div class="row align-items-center g-2">
+
+                <!-- Logo -->
+                <div class="col-6 col-md-2">
+                    <a class="mc-logo" asp-controller="Customer" asp-action="Home">
+                        <img class="mc-logo-img" src="~/images/logo-smartstore.png" alt="SmartStore" />
+                        <span class="logo-smart">Smart</span><span class="logo-store">Store</span>
+                    </a>
+                </div>
+                <!-- Chọn khu vực 
+                <div class="col-6 col-md-2">
+                    <div class="dropdown w-100">
+                        <button class="btn mc-location dropdown-toggle w-100"
+                                data-bs-toggle="dropdown">
+                            Xem giá, tồn kho tại<br />
+                            <b>Hà Nội</b>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Hà Nội</a></li>
+                            <li><a class="dropdown-item" href="#">TP.HCM</a></li>
+                            <li><a class="dropdown-item" href="#">Đà Nẵng</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div class="col-12 col-md-4 order-3 order-md-2">
+                    <form asp-controller="Customer" asp-action="Search" method="get" class="mc-search">
+                        <input name="keyword" class="form-control"
+                               placeholder="Tìm kiếm sản phẩm ..." />
+                        <button class="btn" type="submit"><i class="bi bi-search"></i></button>
+                    </form>
+                </div>
+
+                <!-- Account + Tin tức -->
+                <div class="col-12 col-md-4 d-flex justify-content-end gap-2 order-2 order-md-3">
+
+                    @if (!isLoggedIn)
+                    {
+                        <a asp-controller="Customer" asp-action="Login" class="btn mc-btn">
+                            <i class="bi bi-person"></i><br />Đăng nhập
+                        </a>
+                        <a asp-controller="Customer" asp-action="Register" class="btn mc-btn">
+                            <i class="bi bi-person-plus"></i><br />Đăng ký
+                        </a>
+                    }
+                    else
+                    {
+                        <div class="dropdown">
+                            <button class="btn mc-btn dropdown-toggle" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i><br />
+                                @userName
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                @if (isStaff || isManager)
+                                {
+                                    <li><a class="dropdown-item" asp-controller="Mathangs" asp-action="Index">Quản lý sản phẩm</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Danhmucs" asp-action="Index">Quản lý danh mục</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Orders" asp-action="Index">Duyệt đơn hàng</a></li>
+
+                                    @if (isManager)
+                                    {
+                                        <li><a class="dropdown-item" asp-controller="Nhanviens" asp-action="Index">Quản lý nhân viên</a></li>
+                                        <li><a class="dropdown-item" asp-controller="AdminCustomers" asp-action="Index">Quản lý khách hàng</a></li>
+                                    }
+
+                                    <li><hr class="dropdown-divider" /></li>
+                                }
+
+                                @if (isStaff || isManager)
+                                {
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Nhanviens"
+                                           asp-action="Details"
+                                           asp-route-id="@adminId">
+                                            Hồ sơ
+                                        </a>
+                                    </li>
+                                }
+                                else if (customerId.HasValue)
+                                {
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Customer"
+                                           asp-action="CustomerInfo">
+                                            Hồ sơ
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Customer"
+                                           asp-action="MyOrders">
+                                            Đơn hàng của tôi
+                                        </a>
+                                    </li>
+                                }
+
+                                <li>
+                                    <a class="dropdown-item text-danger"
+                                       asp-controller="Customer"
+                                       asp-action="Signout">
+                                        Đăng xuất
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    }
+
+                    <a asp-controller="Customer" asp-action="Cart" class="btn mc-btn position-relative">
+                        <i class="bi bi-cart3"></i><br />Giỏ hàng
+                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                            @cartCount
+                        </span>
+                    </a>
+
+                    <a class="btn mc-link-btn d-none d-md-inline" href="#">TIN TỨC</a>
+                    <a class="btn mc-link-btn d-none d-md-inline" href="#">EVENTS</a>
+                    <a class="btn mc-link-btn d-none d-md-inline" href="#">TRA CỨU BH</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HEADER TẦNG 2 (MENU ICON + MEGA HOVER) ===== -->
+        <nav class="mc-nav">
+            <div class="container">
+                <ul class="mc-nav-list">
+
+                    <!-- Điện thoại -->
+                    <li class="mc-nav-item has-mega">
+                        <a asp-controller="Customer" asp-action="Phones">
+                            <i class="bi bi-phone"></i> Điện thoại
+                        </a>
+
+                        <!-- Mega menu hover giữ nguyên -->
+                        <div class="mc-mega">
+                            <div class="mc-mega-col">
+                                <h6>Hãng sản xuất</h6>
+                                <a asp-controller="Customer" asp-action="ByCategory" asp-route-id="1">iPhone</a>
+                                <a asp-controller="Customer" asp-action="ByCategory" asp-route-id="2">Samsung</a>
+                                <a asp-controller="Customer" asp-action="ByCategory" asp-route-id="3">Xiaomi</a>
+                                
+                            </div>
+
+                            <div class="mc-mega-col">
+                                <h6>Phân khúc giá</h6>
+                                <a asp-controller="Customer" asp-action="FilterPrice" asp-route-min="0" asp-route-max="5000000">Dưới 5 triệu</a>
+                                <a asp-controller="Customer" asp-action="FilterPrice" asp-route-min="5000000" asp-route-max="10000000">5 - 10 triệu</a>
+                                <a asp-controller="Customer" asp-action="FilterPrice" asp-route-min="10000000" asp-route-max="20000000">10 - 20 triệu</a>
+                                <a asp-controller="Customer" asp-action="FilterPrice" asp-route-min="20000000">Trên 20 triệu</a>
+                            </div>
+
+                            <div class="mc-mega-col">
+                                <h6>Nhu cầu</h6>
+
+                                <a asp-controller="Customer"
+                                   asp-action="Index"
+                                   asp-route-sort="bestseller">Bán chạy</a>
+
+                                <a asp-controller="Customer"
+                                   asp-action="Index"
+                                   asp-route-sort="new">Hàng mới về</a>
+
+                                <a asp-controller="Customer"
+                                   asp-action="Index"
+                                   asp-route-sort="sale">Giảm giá tốt</a>
+                            </div>
+
+                        </div>
+                    </li>
+
+                    <!-- Máy tính bảng -->
+                    <li class="mc-nav-item">
+                        <a asp-controller="Customer" asp-action="Tablets">
+                            <i class="bi bi-tablet"></i> Máy tính bảng
+                        </a>
+                    </li>
+
+                    <!-- Tai nghe -->
+                    <li class="mc-nav-item">
+                        <a asp-controller="Customer" asp-action="Headphones">
+                            <i class="bi bi-earbuds"></i> Tai nghe
+                        </a>
+                    </li>
+
+                    <!-- Phụ kiện -->
+                    <li class="mc-nav-item">
+                        <a asp-controller="Customer" asp-action="Accessories">
+                            <i class="bi bi-usb-plug"></i> Phụ kiện
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+    </header>
+
+   
+    @RenderSection("Banner", required: false)
+
+    <!-- ===== BODY ===== -->
+    <main class="container my-3">
+        @RenderBody()
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="mc-footer mt-4 text-light" style="background:#0b0f1a">
+    <div class="container py-4">
+
+        <!-- LOGO + BANNER -->
+        <div class="row align-items-center mb-4">
+            <div class="col-md-4 text-center text-md-start mb-3 mb-md-0">
+                <img src="~/images/logo-smartstore.png"
+                     alt="SmartStore Logo"
+                     style="max-height:80px" />
+            </div>          
+        </div>
+
+        <hr class="border-secondary" />
+
+        <!-- LIÊN KẾT -->
+        <div class="row text-center text-md-start">
+            <div class="col-md-4 mb-3">
+                <h6 class="text-warning">SmartStore</h6>
+                <p class="small mb-1">Hệ Thống Kinh Doanh SmartPhone</p>
+                <p class="small mb-0">Uy tín – Chính hãng – Giá tốt</p>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <h6 class="text-warning">Kết nối với chúng tôi</h6>
+                <a href="https://www.facebook.com/profile.php?id=61586176919781"
+                   target="_blank"
+                   class="d-block text-decoration-none text-light mb-1">
+                    <i class="bi bi-facebook me-1"></i> Facebook
+                </a>
+                <a href="https://www.youtube.com/channel/UCm-PVIQHIMUnDsci-tQNmRg"
+                   target="_blank"
+                   class="d-block text-decoration-none text-light mb-1">
+                    <i class="bi bi-youtube me-1"></i> YouTube
+                </a>
+                    <a href="https://tiktok.com/%40smartstore1726"
+                       target="_blank"
+                       class="d-block text-decoration-none text-light mb-1">
+                        <i class="bi bi-tiktok me-1"></i> TikTok
+                    </a>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <h6 class="text-warning">Mua hàng online</h6>
+                <a href="https://vn.shp.ee/e5xE5cR"
+                   target="_blank"
+                   class="d-block text-decoration-none text-light mb-1">
+                    <i class="bi bi-bag-check me-1"></i> Gian hàng Shopee
+                </a>
+                <a href="https://smartstore.vn"
+                   target="_blank"
+                   class="d-block text-decoration-none text-light">
+                    <i class="bi bi-globe me-1"></i> Website chính thức
+                </a>
+            </div>
+        </div>
+
+        <hr class="border-secondary" />
+
+        <!-- COPYRIGHT -->
+        <div class="text-center small">
+            © @DateTime.Now.Year SmartStore – Hệ Thống Kinh Doanh SmartPhone.
+        </div>
+    </div>
+</footer>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+
+</body>
+</html>

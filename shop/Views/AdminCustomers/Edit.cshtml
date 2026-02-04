@@ -1,0 +1,43 @@
+﻿@model shop.Models.Khachhang
+@{
+    ViewData["Title"] = "Cập nhật khách hàng";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-warning text-dark fw-semibold">
+        ✏️ Cập nhật khách hàng
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="MaKh" />
+
+            <div class="mb-3">
+                <label asp-for="Ten" class="form-label"></label>
+                <input asp-for="Ten" class="form-control" />
+                <span asp-validation-for="Ten" class="text-danger"></span>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="DienThoai" class="form-label"></label>
+                    <input asp-for="DienThoai" class="form-control" />
+                    <span asp-validation-for="DienThoai" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    ← Quay lại danh sách
+                </a>
+                <button type="submit" class="btn btn-warning">
+                    💾 Lưu thay đổi
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

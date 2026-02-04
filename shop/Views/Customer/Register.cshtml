@@ -1,0 +1,83 @@
+﻿@model shop.Models.Khachhang
+
+@{
+    ViewData["Title"] = "Đăng ký";
+}
+
+<div class="container my-4 d-flex justify-content-center">
+    <div class="text-center" style="max-width: 480px; width:100%;">
+
+        <!-- Tiêu đề -->
+        <h3 class="fw-bold text-warning mb-2">Đăng ký</h3>
+
+        <div class="mb-3 text-muted">
+            Nhập thông tin của bạn để tạo tài khoản
+        </div>
+
+        <form asp-action="Register" method="post" class="mt-2">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="All" class="text-danger mb-2"></div>
+
+            <!-- Họ tên -->
+            <div class="mb-2 text-start">
+                <label asp-for="Ten" class="form-label small mb-1">Họ tên</label>
+                <input asp-for="Ten" class="form-control" />
+                <span asp-validation-for="Ten" class="text-danger small"></span>
+            </div>
+
+            <!-- Số điện thoại -->
+            <div class="mb-2 text-start">
+                <label asp-for="DienThoai" class="form-label small mb-1">Số điện thoại</label>
+                <input asp-for="DienThoai" class="form-control" />
+                <span asp-validation-for="DienThoai" class="text-danger small"></span>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-2 text-start">
+                <label asp-for="Email" class="form-label small mb-1">Email</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <!-- Mật khẩu -->
+            <div class="mb-3 text-start">
+                <label asp-for="MatKhau" class="form-label small mb-1">Mật khẩu</label>
+                <input asp-for="MatKhau" class="form-control" type="password" />
+                <span asp-validation-for="MatKhau" class="text-danger small"></span>
+            </div>
+
+            <!-- Khung "Tôi không phải là người máy" kiểu MobileCity (giả reCAPTCHA) -->
+            <div class="mb-3">
+                <div class="border rounded bg-light py-3 px-3 d-flex align-items-center justify-content-between">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="notRobot" required />
+                        <label class="form-check-label small" for="notRobot">
+                            Tôi không phải là người máy
+                        </label>
+                    </div>
+                    <div class="text-end small text-muted">
+                        <div>reCAPTCHA</div>
+                        <div class="small">Bảo mật - Điều khoản</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút TIẾP TỤC màu cam -->
+            <button type="submit"
+                    class="btn fw-bold text-white w-100 mb-3"
+                    style="background: linear-gradient(90deg,#ff9933,#ff6600);">
+                TIẾP TỤC
+            </button>
+
+            <div class="mb-1">
+                Bạn đã có tài khoản?
+                <a asp-action="Login">Đăng nhập</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

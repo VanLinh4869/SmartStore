@@ -1,0 +1,52 @@
+﻿@model shop.Models.Khachhang
+
+@{
+    ViewData["Title"] = "Chi tiết khách hàng";
+    int orderCount = ViewBag.OrderCount ?? 0;
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-info text-white fw-semibold">
+        👤 Chi tiết khách hàng
+    </div>
+
+    <div class="card-body">
+
+        <dl class="row mb-3">
+            <dt class="col-sm-3">Mã khách hàng:</dt>
+            <dd class="col-sm-9">@Model.MaKh</dd>
+
+            <dt class="col-sm-3">Họ tên:</dt>
+            <dd class="col-sm-9">@Model.Ten</dd>
+
+            <dt class="col-sm-3">Email:</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+
+            <dt class="col-sm-3">Số điện thoại:</dt>
+            <dd class="col-sm-9">@Model.DienThoai</dd>
+
+            <dt class="col-sm-3">Số đơn hàng đã đặt:</dt>
+            <dd class="col-sm-9">
+                <span class="fw-bold">@orderCount</span>
+            </dd>
+        </dl>
+
+        <div class="mt-4 d-flex gap-2">
+            <a asp-action="Orders" asp-route-id="@Model.MaKh" class="btn btn-primary">
+                📦 Xem đơn hàng
+            </a>
+
+            <a asp-action="Edit" asp-route-id="@Model.MaKh" class="btn btn-warning">
+                ✏️ Sửa thông tin
+            </a>
+
+            <a asp-action="Delete" asp-route-id="@Model.MaKh" class="btn btn-danger">
+                🗑 Xóa khách hàng
+            </a>
+
+            <a asp-action="Index" class="btn btn-outline-secondary ms-auto">
+                ← Quay lại danh sách
+            </a>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,68 @@
+﻿@model shop.Models.Hoadon
+
+@{
+    ViewData["Title"] = $"Đơn hàng #{Model.MaHd}";
+}
+
+<h4 class="mb-3">Đơn hàng #@Model.MaHd</h4>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <strong>Thông tin khách hàng</strong>
+            </div>
+            <div class="card-body small">
+                <p class="mb-1"><strong>Khách hàng:</strong> @Model.MaKhNavigation?.Ten</p>
+                <p class="mb-1"><strong>Điện thoại:</strong> @Model.MaKhNavigation?.DienThoai</p>
+                <p class="mb-1"><strong>Email:</strong> @Model.MaKhNavigation?.Email</p>
+                <p class="mb-1"><strong>Ngày đặt:</strong> @Model.Ngay?.ToString("dd/MM/yyyy HH:mm")</p>
+                <p class="mb-1"><strong>Trạng thái:</strong> @Model.TrangThai</p>
+                @if (Model.MaNvDuyetNavigation != null)
+                {
+                    <p class="mb-1">
+                        <strong>Quản lý duyệt:</strong> @Model.MaNvDuyetNavigation.Ten
+                        (@Model.NgayDuyet?.ToString("dd/MM/yyyy HH:mm"))
+                    </p>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-light d-flex justify-content-between">
+                <strong>Sản phẩm trong đơn</strong>
+                <span class="small">Tổng tiền: <b class="text-danger">@String.Format("{0:N0} đ", Model.TongTien ?? 0)</b></span>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-sm align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Sản phẩm</th>
+                            <th class="text-center" style="width:80px;">SL</th>
+                            <th class="text-end" style="width:120px;">Đơn giá</th>
+                            <th class="text-end" style="width:120px;">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ct in Model.Cthoadons)
+                        {
+                            <tr>
+                                <td>@ct.MaMhNavigation?.Ten</td>
+                                <td class="text-center">@ct.SoLuong</td>
+                                <td class="text-end">@String.Format("{0:N0} đ", ct.DonGia ?? 0)</td>
+                                <td class="text-end">@String.Format("{0:N0} đ", ct.ThanhTien ?? 0)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                    &laquo; Quay lại danh sách
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

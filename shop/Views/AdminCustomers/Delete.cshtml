@@ -1,0 +1,52 @@
+﻿@model shop.Models.Khachhang
+@{
+    ViewData["Title"] = "Xoá khách hàng";
+    int orderCount = ViewBag.OrderCount ?? 0;
+    bool canDelete = ViewBag.CanDelete ?? false;
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-danger text-white fw-semibold">
+        ⚠️ Xoá khách hàng
+    </div>
+    <div class="card-body">
+        <p>Bạn có chắc muốn xoá khách hàng sau?</p>
+
+        <ul class="list-group mb-3">
+            <li class="list-group-item"><strong>Mã KH:</strong> @Model.MaKh</li>
+            <li class="list-group-item"><strong>Họ tên:</strong> @Model.Ten</li>
+            <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
+            <li class="list-group-item"><strong>Điện thoại:</strong> @Model.DienThoai</li>
+            <li class="list-group-item">
+                <strong>Số đơn hàng:</strong> @orderCount
+            </li>
+        </ul>
+
+        @if (!canDelete)
+        {
+            <div class="alert alert-warning">
+                Khách hàng này đã có @orderCount đơn hàng, không thể xoá.
+            </div>
+
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                ← Quay lại danh sách
+            </a>
+            <a asp-action="Orders" asp-route-id="@Model.MaKh"
+               class="btn btn-primary ms-2">
+                Xem đơn hàng
+            </a>
+        }
+        else
+        {
+            <form asp-action="Delete" method="post" class="d-inline">
+                <input type="hidden" asp-for="MaKh" />
+                <button type="submit" class="btn btn-danger">
+                    🗑 Xoá khách hàng
+                </button>
+            </form>
+            <a asp-action="Index" class="btn btn-outline-secondary ms-2">
+                Huỷ
+            </a>
+        }
+    </div>
+</div>
