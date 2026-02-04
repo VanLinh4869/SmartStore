@@ -1,0 +1,391 @@
+﻿@model shop.Models.ViewModels.ProductDetailViewModel
+
+@{
+    var p = Model.Product;
+
+    bool showMemory = p.MaDm == 1 || p.MaDm == 2 || p.MaDm == 3 || p.MaDm == 5;
+
+
+    var s = Model.Specs; // Thông số kỹ thuật (có thể null)
+
+    ViewData["Title"] = p.Ten;
+
+    string imgPath = Url.Content("~/images/products/" + p.HinhAnh);
+
+    int giaGoc = p.GiaGoc ?? 0;
+    int giaBan = p.GiaBan ?? 0;
+    int giam = giaGoc - giaBan;
+    int percent = (giaGoc > 0 && giaBan < giaGoc)
+        ? (int)Math.Round(100.0 * giam / giaGoc)
+        : 0;
+}
+
+<div class="container my-4">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item">
+                <a asp-controller="Customer" asp-action="Home">Trang chủ</a>
+            </li>
+
+            <li class="breadcrumb-item">
+                <a asp-controller="Customer"
+                   asp-action="ByCategory"
+                   asp-route-id="@p.MaDm">
+                    @p.MaDmNavigation?.Ten  
+                </a>
+            </li>
+
+            <li class="breadcrumb-item active" aria-current="page">
+                @p.Ten
+            </li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <!-- Ảnh sản phẩm -->
+        <div class="col-lg-4">
+            <div class="border rounded p-3 text-center bg-white">
+                <img src="@imgPath" class="img-fluid" alt="@p.Ten" />
+            </div>
+        </div>
+
+        <!-- Thông tin chính + lựa chọn màu / phiên bản -->
+        <div class="col-lg-5">
+            <h4 class="fw-semibold mb-2">@p.Ten</h4>
+
+            <div class="mb-2">
+                <span class="badge bg-warning text-dark me-1">Còn hàng</span>
+                <span class="text-muted small">Mã SP: @p.MaMh</span>
+            </div>
+
+            <div class="mb-3">
+                <span class="fs-3 fw-bold text-danger me-2">
+                    @String.Format("{0:N0} đ", giaBan)
+                </span>
+
+                @if (giaGoc > giaBan)
+                {
+                    <span class="text-muted text-decoration-line-through me-2">
+                        @String.Format("{0:N0} đ", giaGoc)
+                    </span>
+
+                    @if (percent > 0)
+                    {
+                        <span class="badge bg-danger">-@percent%</span>
+                    }
+                }
+            </div>
+
+            <!-- Màu sắc -->
+            <div class="mb-3">
+                <div class="fw-semibold small mb-1">Màu sắc</div>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm color-option"
+                            data-value="Đen">
+                        Đen
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm color-option"
+                            data-value="Trắng">
+                        Trắng
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm color-option"
+                            data-value="Xanh">
+                        Xanh
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-outline-secondary btn-sm color-option"
+                            data-value="Tím">
+                        Tím
+                    </button>
+                </div>
+            </div>
+
+            @if (showMemory)
+            {
+                <!-- Phiên bản bộ nhớ -->
+                <div class="mb-3">
+                    <div class="fw-semibold small mb-1">Bộ nhớ</div>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm storage-option"
+                                data-value="4GB / 64GB">
+                            4GB / 64GB
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm storage-option"
+                                data-value="6GB / 128GB">
+                            6GB / 128GB
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-sm storage-option"
+                                data-value="8GB / 256GB">
+                            8GB / 256GB
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <!-- Thông tin chung -->
+            <ul class="list-unstyled small mb-3">
+                <li><strong>Bảo hành:</strong> 12 tháng tại cửa hàng</li>
+                <li><strong>Giao hàng:</strong> Nội thành 2h, tỉnh 2–4 ngày</li>
+                <li>
+                    <strong>Lượt xem:</strong> @p.LuotXem
+                    | <strong>Lượt mua:</strong> @p.LuotMua
+                </li>
+                <li><strong>Tình trạng:</strong> Mới 100%</li>
+            </ul>
+
+            <div class="mb-3">
+                <h6>Mô tả nhanh</h6>
+                @if (!string.IsNullOrEmpty(p.MoTa))
+                {
+                    <p class="small mb-0">@p.MoTa</p>
+                }
+                else
+                {
+                    <p class="small mb-0">
+                        Sản phẩm chính hãng, cấu hình tốt, phù hợp cho nhu cầu học tập,
+                        làm việc và giải trí hàng ngày.
+                    </p>
+                }
+            </div>
+        </div>
+
+        <!-- Box mua hàng bên phải -->
+        <div class="col-lg-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <!-- FORM MUA HÀNG -->
+                    <form asp-controller="Customer" asp-action="AddToCart" method="post">
+                        <input type="hidden" name="id" value="@p.MaMh" />
+                        <input type="hidden" name="color" id="SelectedColor" />
+                        <input type="hidden" name="storage" id="SelectedStorage" />
+
+                        <h6 class="card-title">@p.Ten</h6>
+
+                        <p class="mb-1 text-danger fs-4 fw-bold">
+                            @String.Format("{0:N0} đ", giaBan)
+                        </p>
+
+                        @if (giaGoc > giaBan)
+                        {
+                            <p class="small text-muted mb-2">
+                                Giá hãng:
+                                <span class="text-decoration-line-through">
+                                    @String.Format("{0:N0} đ", giaGoc)
+                                </span>
+                            </p>
+                        }
+
+                        <div class="mb-3 d-flex align-items-center">
+                            <span class="me-2 small">Số lượng:</span>
+                            <input type="number" name="quantity" value="1" min="1"
+                                   class="form-control form-control-sm" style="width:90px;" />
+                        </div>
+
+                        <!-- CHỈ CÒN 1 NÚT: THÊM VÀO GIỎ -->
+                        <button type="submit" class="btn btn-primary w-100 mb-2">
+                            <i class="bi bi-cart-plus me-1"></i> Thêm vào giỏ
+                        </button>
+
+                        <hr />
+
+                        <h6 class="small fw-bold">Khuyến mãi</h6>
+                        <ul class="small ps-3 mb-0">
+                            <li>Miễn phí dán cường lực khi mua tại cửa hàng</li>
+                            <li>Giảm thêm 2% khi thanh toán chuyển khoản</li>
+                            <li>Hỗ trợ trả góp 0% qua thẻ tín dụng</li>
+                        </ul>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Khối dưới: Thông số + thông tin chi tiết + sản phẩm tương tự -->
+    <div class="row mt-4 g-4">
+        <!-- Thông số kỹ thuật + mô tả dài -->
+        <div class="col-lg-8">
+            <div class="card mb-3">
+                <div class="card-header bg-light">
+                    <strong>Thông số kỹ thuật</strong>
+                </div>
+                <div class="card-body p-0">
+                    @if (s != null)
+                    {
+                        <table class="table table-sm mb-0">
+                            <tbody>
+                                <tr>
+                                    <th style="width:25%;">Màn hình</th>
+                                    <td>@s.ManHinh</td>
+                                </tr>
+                                <tr>
+                                    <th>Hệ điều hành</th>
+                                    <td>@s.HeDieuHanh</td>
+                                </tr>
+                                <tr>
+                                    <th>Camera sau</th>
+                                    <td>@s.CameraSau</td>
+                                </tr>
+                                <tr>
+                                    <th>Camera trước</th>
+                                    <td>@s.CameraTruoc</td>
+                                </tr>
+                                <tr>
+                                    <th>CPU</th>
+                                    <td>@s.CPU</td>
+                                </tr>
+                                <tr>
+                                    <th>RAM</th>
+                                    <td>@s.RAM</td>
+                                </tr>
+                                <tr>
+                                    <th>Bộ nhớ trong</th>
+                                    <td>@s.BoNho</td>
+                                </tr>
+                                <tr>
+                                    <th>Thẻ SIM</th>
+                                    <td>@s.TheSim</td>
+                                </tr>
+                                <tr>
+                                    <th>Dung lượng pin</th>
+                                    <td>@s.Pin</td>
+                                </tr>
+                                <tr>
+                                    <th>Thiết kế</th>
+                                    <td>@s.ThietKe</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="p-3 small">
+                            Thông số kỹ thuật đang được cập nhật.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-light">
+                    <strong>Thông tin chi tiết</strong>
+                </div>
+                <div class="card-body">
+                    @if (!string.IsNullOrEmpty(p.MoTa))
+                    {
+                        <p>@p.MoTa</p>
+                    }
+                    else
+                    {
+                        <p>
+                            Đây là sản phẩm thuộc danh mục @p.MaDmNavigation?.Ten,
+                            phù hợp cho nhu cầu học tập, làm việc văn phòng, giải trí và chơi game nhẹ.
+                        </p>
+                        <p>
+                            Quý khách có thể liên hệ trực tiếp cửa hàng để được tư vấn thêm về cấu hình,
+                            màu sắc và các chương trình khuyến mãi hiện hành.
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Sản phẩm tương tự -->
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header bg-warning text-dark fw-bold">
+                    Sản phẩm tương tự
+                </div>
+                <div class="card-body">
+                    @if (Model.RelatedProducts.Any())
+                    {
+                        @foreach (var item in Model.RelatedProducts)
+                        {
+                            <div class="d-flex mb-3 small">
+                                <a asp-action="Details" asp-route-id="@item.MaMh">
+                                    <img src="~/images/products/@item.HinhAnh"
+                                         class="me-2 rounded"
+                                         style="width:70px;height:70px;object-fit:cover"
+                                         alt="@item.Ten" />
+                                </a>
+                                <div>
+                                    <a asp-action="Details" asp-route-id="@item.MaMh"
+                                       class="text-decoration-none">
+                                        <div class="fw-semibold">@item.Ten</div>
+                                    </a>
+                                    <div class="text-danger fw-bold">
+                                        @String.Format("{0:N0} đ", item.GiaBan ?? 0)
+                                    </div>
+                                    @if ((item.GiaGoc ?? 0) > (item.GiaBan ?? 0))
+                                    {
+                                        <div class="text-muted text-decoration-line-through">
+                                            @String.Format("{0:N0} đ", item.GiaGoc ?? 0)
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="small mb-0">Chưa có sản phẩm tương tự.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const colorInput = document.getElementById("SelectedColor");
+            const storageInput = document.getElementById("SelectedStorage");
+
+            function selectButton(btn, groupSelector, input) {
+                const value = btn.dataset.value;
+                input.value = value;
+
+                document.querySelectorAll(groupSelector).forEach(b => {
+                    b.classList.remove("btn-primary", "active");
+                    b.classList.add("btn-outline-secondary");
+                });
+
+                btn.classList.remove("btn-outline-secondary");
+                btn.classList.add("btn-primary", "active");
+            }
+
+            document.querySelectorAll(".color-option").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    selectButton(this, ".color-option", colorInput);
+                });
+            });
+
+            document.querySelectorAll(".storage-option").forEach(btn => {
+                btn.addEventListener("click", function () {
+                    selectButton(this, ".storage-option", storageInput);
+                });
+            });
+
+            // chọn mặc định nút đầu tiên
+            const firstColor = document.querySelector(".color-option");
+            if (firstColor) firstColor.click();
+
+            const firstStorage = document.querySelector(".storage-option");
+            if (firstStorage) firstStorage.click();
+        });
+    </script>
+}

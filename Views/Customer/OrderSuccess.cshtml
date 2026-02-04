@@ -1,0 +1,19 @@
+﻿@model shop.Models.Hoadon
+
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+}
+
+<div class="container my-4">
+    <div class="alert alert-success">
+        <h5 class="alert-heading">Đặt hàng thành công!</h5>
+        <p class="mb-0">
+            Cảm ơn bạn đã đặt hàng tại <strong>ABC Mobile</strong>.<br />
+            Mã đơn hàng của bạn là: <strong>#@Model.MaHd</strong><br />
+            Ngày đặt: @Model.Ngay?.ToString("dd/MM/yyyy HH:mm")
+        </p>
+    </div>
+
+    <a asp-action="Home" class="btn btn-primary">Tiếp tục mua sắm</a>
+    <a asp-action="Cart" class="btn btn-outline-secondary">Xem giỏ hàng</a>
+</div>

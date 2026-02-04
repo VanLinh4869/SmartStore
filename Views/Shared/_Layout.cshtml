@@ -1,0 +1,108 @@
+﻿@{
+    var title = ViewData["Title"] ?? "Trang quản trị";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@title - ABC Mobile Admin</title>
+
+    <!-- Bootstrap (dùng lib có sẵn của project) -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/shop.styles.css" asp-append-version="true" />
+
+    <!-- Bootstrap Icons (CDN) -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+</head>
+<body>
+    <!-- TOP NAV -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+            <div class="container-fluid">
+                <!-- Logo admin -->
+                <a class="navbar-brand" asp-controller="Mathangs" asp-action="Index">
+                    <i class="bi bi-speedometer2 me-1"></i>
+                    ABC Mobile <span class="text-warning">Admin</span>
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#adminNavbar" aria-controls="adminNavbar"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="adminNavbar">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                       
+                        <!-- Trang chủ admin (danh sách mặt hàng) -->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Mathangs" asp-action="Index">
+                                <i class="bi bi-box-seam"></i> QL mặt hàng
+                            </a>
+                        </li>
+
+                        <!-- Quản lý danh mục -->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Danhmucs" asp-action="Index">
+                                <i class="bi bi-tags"></i> QL danh mục
+                            </a>
+                        </li>
+
+                        <!-- Chỗ này sau muốn thêm QL hóa đơn / khách / nhân viên thì add tiếp -->
+                        @* 
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Hoadons" asp-action="Index">
+                                <i class="bi bi-receipt"></i> QL hóa đơn
+                            </a>
+                        </li>
+                        *@
+                    </ul>
+
+                    <!-- Góc phải: info admin + logout -->
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <span class="navbar-text text-light me-3">
+                                <i class="bi bi-person-badge"></i> Admin
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light btn-sm"
+                               asp-controller="Customer" asp-action="Signout">
+                                <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <div class="col-12">
+                <main role="main" class="pb-3">
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="border-top mt-4 py-3 bg-light">
+        <div class="container-fluid text-center text-muted small">
+            © @DateTime.Now.Year ABC Mobile Admin – Hệ thống quản trị sản phẩm
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

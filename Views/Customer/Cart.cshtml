@@ -1,0 +1,147 @@
+﻿@model List<shop.Models.CartItem>
+
+@{
+    ViewData["Title"] = "Giỏ hàng của bạn";
+}
+
+<div class="container my-4">
+    <h3 class="mb-3">Giỏ hàng của bạn</h3>
+
+    @if (!Model.Any())
+    {
+        <p>Giỏ hàng đang trống.</p>
+    }
+    else
+    {
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th style="width:5%;">STT</th>
+                    <th style="width:35%;">Sản phẩm</th>
+                    <th style="width:10%;">Giá</th>
+                    <th style="width:30%;">Tùy chọn</th>
+                    <th style="width:10%;">Thành tiền</th>
+                    <th style="width:10%;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = 1;
+                }
+                @foreach (var item in Model)
+                {
+                    var m = item.MatHang;
+
+                    // cấu hình list màu và bộ nhớ theo danh mục
+                    var colors = new List<string>();
+                    var storages = new List<string>();
+
+                    switch (m.MaDm)
+                    {
+                        case 1: // iPhone
+                            colors = new List<string> { "Đen", "Trắng", "Xanh", "Hồng" };
+                            storages = new List<string> { "128GB", "256GB", "512GB" };
+                            break;
+                        case 2: // Samsung
+                            colors = new List<string> { "Đen", "Xanh", "Tím" };
+                            storages = new List<string> { "128GB", "256GB" };
+                            break;
+                        case 3: // Xiaomi
+                            colors = new List<string> { "Đen", "Trắng", "Xanh" };
+                            storages = new List<string> { "256GB", "512GB" };
+                            break;
+                        default:
+                            colors = new List<string> { "Mặc định" };
+                            storages = new List<string> { "Mặc định" };
+                            break;
+                    }
+                    <tr>
+                        <td>@stt</td>
+                        <td>
+                            <div class="d-flex">
+                                <img src="~/images/products/@m.HinhAnh"
+                                     style="width:60px;height:60px;object-fit:cover"
+                                     class="me-2 rounded" />
+                                <div>
+                                    <div class="fw-semibold">@m.Ten</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>@String.Format("{0:N0} đ", m.GiaBan ?? 0)</td>
+
+                        <td>
+                            <!-- FORM CẬP NHẬT NẰM GỌN TRONG MỘT Ô -->
+                            <form asp-action="UpdateItem" method="post" class="d-flex flex-wrap gap-1">
+                                <input type="hidden" name="id" value="@m.MaMh" />
+
+                                <!-- Màu sắc -->
+                                <select name="color" class="form-select form-select-sm" style="max-width:120px;">
+                                    @foreach (var c in colors)
+                                    {
+                                        if (c == item.MauSac)
+                                        {
+                                            <option value="@c" selected>@c</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@c">@c</option>
+                                        }
+                                    }
+                                </select>
+
+                                <!-- Bộ nhớ -->
+                                <select name="storage" class="form-select form-select-sm" style="max-width:120px;">
+                                    @foreach (var s in storages)
+                                    {
+                                        if (s == item.PhienBan)
+                                        {
+                                            <option value="@s" selected>@s</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@s">@s</option>
+                                        }
+                                    }
+                                </select>
+
+                                <!-- Số lượng -->
+                                <input type="number"
+                                       name="quantity"
+                                       value="@item.SoLuong"
+                                       min="1"
+                                       class="form-control form-control-sm"
+                                       style="max-width:80px;" />
+
+                                <button type="submit" class="btn btn-warning btn-sm">
+                                    Cập nhật
+                                </button>
+                            </form>
+                        </td>
+
+                        <td class="text-danger fw-bold">
+                            @String.Format("{0:N0} đ", item.ThanhTien)
+                        </td>
+
+                        <td>
+                            <a asp-action="RemoveItem"
+                               asp-route-id="@m.MaMh"
+                               class="text-danger small">Xóa</a>
+                        </td>
+                    </tr>
+                    stt++;
+                }
+            </tbody>
+        </table>
+
+        <div class="text-end mb-3">
+            <strong>Thành tiền: </strong>
+            <span class="fs-5 text-danger fw-bold">
+                @String.Format("{0:N0} đ", Model.Sum(x => x.ThanhTien))
+            </span>
+        </div>
+
+        <div class="text-end">
+            <a asp-action="CheckOut" class="btn btn-info">Thanh toán</a>
+        </div>
+    }
+</div>

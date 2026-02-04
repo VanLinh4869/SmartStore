@@ -1,0 +1,64 @@
+﻿@model shop.Models.ViewModels.CustomerInfoViewModel
+
+@{
+    ViewData["Title"] = ViewBag.PageTitle ?? "Hồ sơ của tôi";
+}
+
+<div class="container my-4">
+    <h4 class="mb-3">@ViewData["Title"]</h4>
+
+    @if (ViewBag.Success != null)
+    {
+        <div class="alert alert-success">@ViewBag.Success</div>
+    }
+
+    <form asp-action="CustomerInfo" method="post">
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+        <div class="mb-3">
+            <label asp-for="Ten" class="form-label"></label>
+            <input asp-for="Ten" class="form-control" />
+            <span asp-validation-for="Ten" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="DienThoai" class="form-label"></label>
+            <input asp-for="DienThoai" class="form-control" />
+            <span asp-validation-for="DienThoai" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <hr />
+
+        <h6>Đổi mật khẩu (tuỳ chọn)</h6>
+
+        <div class="mb-3">
+            <label asp-for="NewPassword" class="form-label"></label>
+            <input asp-for="NewPassword" class="form-control" />
+            <span asp-validation-for="NewPassword" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ConfirmPassword" class="form-label"></label>
+            <input asp-for="ConfirmPassword" class="form-control" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Lưu thay đổi
+        </button>
+        <a asp-action="Home" class="btn btn-outline-secondary ms-2">
+            Về trang chủ
+        </a>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,101 @@
+﻿@model IEnumerable<shop.Models.Mathang>
+@using System.Linq
+@if (TempData["OrderSuccess"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        @TempData["OrderSuccess"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@{
+    ViewData["Title"] = ViewBag.PageTitle ?? "Trang chủ";
+
+    var phones = Model.Where(m => m.MaDm == 1 || m.MaDm == 2 || m.MaDm == 3).Take(8).ToList();
+    var tablets = Model.Where(m => m.MaDm == 5).Take(8).ToList();
+    var headphones = Model.Where(m => m.MaDm == 6).Take(8).ToList();
+    var accessories = Model.Where(m => m.MaDm == 4).Take(8).ToList();
+}
+
+@section Banner {
+    <div id="homeCarousel" class="carousel slide carousel-fade"
+         data-bs-ride="carousel" data-bs-interval="3500">
+
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="~/images/carousel/banner-main.jpg" />
+            </div>
+            <div class="carousel-item">
+                <img src="~/images/carousel/phone1.jpg" />
+            </div>
+            <div class="carousel-item">
+                <img src="~/images/carousel/phone2.jpg" />
+            </div>
+            <div class="carousel-item">
+                <img src="~/images/carousel/phone3.jpg" />
+            </div>
+            <div class="carousel-item">
+                <img src="~/images/carousel/side1.jpg" />
+            </div>
+            <div class="carousel-item">
+                <img src="~/images/carousel/side2.jpg" />
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" data-bs-target="#homeCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" data-bs-target="#homeCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+}
+
+
+
+
+<!-- ====== ĐIỆN THOẠI ====== -->
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="fw-bold mb-0">Điện thoại</h4>
+    <a class="btn btn-outline-warning btn-sm"
+       asp-controller="Customer" asp-action="Phones">
+        Xem thêm điện thoại
+    </a>
+</div>
+<partial name="_ProductCards" model="phones" />
+
+<hr class="my-4" />
+
+<!-- ====== MÁY TÍNH BẢNG ====== -->
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="fw-bold mb-0">Máy tính bảng</h4>
+    <a class="btn btn-outline-warning btn-sm"
+       asp-controller="Customer" asp-action="Tablets">
+        Xem thêm máy tính bảng
+    </a>
+</div>
+<partial name="_ProductCards" model="tablets" />
+
+<hr class="my-4" />
+
+<!-- ====== TAI NGHE ====== -->
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="fw-bold mb-0">Tai nghe</h4>
+    <a class="btn btn-outline-warning btn-sm"
+       asp-controller="Customer" asp-action="Headphones">
+        Xem thêm tai nghe
+    </a>
+</div>
+<partial name="_ProductCards" model="headphones" />
+
+<hr class="my-4" />
+
+<!-- ====== PHỤ KIỆN ====== -->
+<div class="d-flex justify-content-between align-items-center mb-2">
+    <h4 class="fw-bold mb-0">Phụ kiện</h4>
+    <a class="btn btn-outline-warning btn-sm"
+       asp-controller="Customer" asp-action="Accessories">
+        Xem thêm phụ kiện
+    </a>
+</div>
+<partial name="_ProductCards" model="accessories" />

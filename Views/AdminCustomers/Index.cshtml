@@ -1,0 +1,77 @@
+﻿@model IEnumerable<shop.Models.Khachhang>
+
+@{
+    ViewData["Title"] = "Quản lý khách hàng";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="fw-bold mb-0">Quản lý khách hàng</h4>
+        <div class="text-muted small">
+            Tổng số: @Model.Count() khách
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light">
+        Danh sách khách hàng
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:70px;">Mã KH</th>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>Điện thoại</th>
+                        <th class="text-end" style="width:220px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-3">
+                                Chưa có khách hàng nào.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var k in Model)
+                        {
+                            <tr>
+                                <td>@k.MaKh</td>
+                                <td>@k.Ten</td>
+                                <td>@k.Email</td>
+                                <td>@k.DienThoai</td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Edit" asp-route-id="@k.MaKh"
+                                           class="btn btn-outline-secondary">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@k.MaKh"
+                                           class="btn btn-outline-info">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Orders" asp-route-id="@k.MaKh"
+                                           class="btn btn-outline-primary">
+                                            <i class="bi bi-receipt"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@k.MaKh"
+                                           class="btn btn-outline-danger">
+                                            <i class="bi bi-trash3"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

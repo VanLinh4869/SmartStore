@@ -1,0 +1,89 @@
+﻿@model shop.Models.Nhanvien
+
+@{
+    ViewData["Title"] = "Xóa nhân viên";
+
+    int orderCount = ViewBag.OrderCount as int? ?? 0;
+    bool canDelete = ViewBag.CanDelete as bool? ?? true;
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+
+            @* Thông báo nếu có lỗi từ TempData *@
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            @if (!canDelete)
+            {
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>
+                        Nhân viên <strong>@Model.Ten</strong> đã duyệt
+                        <strong>@orderCount</strong> hóa đơn.
+                        <br />
+                        Bạn cần chuyển người duyệt khác hoặc xử lý các hóa đơn này
+                        trước khi xóa nhân viên.
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>
+                        Bạn có chắc chắn muốn <strong>xóa nhân viên này</strong>?
+                        Thao tác này <strong>không thể hoàn tác</strong>.
+                    </div>
+                </div>
+            }
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <i class="bi bi-person-x-fill"></i> Xóa nhân viên
+                </div>
+
+                <div class="card-body">
+                    <h5 class="fw-semibold mb-3">Thông tin nhân viên</h5>
+
+                    <div class="mb-2">
+                        <strong>Họ tên:</strong> @Model.Ten
+                    </div>
+                    <div class="mb-2">
+                        <strong>Điện thoại:</strong> @Model.DienThoai
+                    </div>
+                    <div class="mb-2">
+                        <strong>Email:</strong> @Model.Email
+                    </div>
+                    <div class="mb-2">
+                        <strong>Chức vụ:</strong> @Model.MaCvNavigation?.Ten
+                    </div>
+
+                    <hr />
+
+                    <form asp-action="Delete" method="post" class="d-flex justify-content-between">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="MaNv" />
+
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Quay lại
+                        </a>
+
+                        <button type="submit"
+                                class="btn btn-danger"
+                                @(canDelete ? "" : "disabled")>
+                            <i class="bi bi-trash3"></i> Xóa nhân viên
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

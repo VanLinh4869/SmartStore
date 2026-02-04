@@ -1,0 +1,148 @@
+﻿@model IEnumerable<shop.Models.Mathang>
+@using System
+
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h4 class="fw-bold mb-0">Quản lý sản phẩm</h4>
+        <div class="text-muted small">
+            Tổng số: @Model.Count() sản phẩm
+        </div>
+    </div>
+
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Thêm sản phẩm
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">
+            Danh sách sản phẩm
+        </span>
+
+        <!-- FORM LỌC THEO DANH MỤC -->
+        <form asp-action="Index" method="get" class="d-flex align-items-center gap-2">
+            <select name="categoryId"
+                    class="form-select form-select-sm"
+                    asp-items="(SelectList)ViewBag.Categories">
+                <option value="">-- Tất cả danh mục --</option>
+            </select>
+
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                Lọc
+            </button>
+        </form>
+    </div>
+
+
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width:60px;">Ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th class="text-end">Giá gốc</th>
+                        <th class="text-end">Giá bán</th>
+                        <th class="text-center" style="width:80px;">SL</th>
+                        <th>Danh mục</th>
+                        <th class="text-center" style="width:90px;">Lượt xem</th>
+                        <th class="text-center" style="width:90px;">Lượt mua</th>
+                        <th class="text-end" style="width:160px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">
+                                Chưa có sản phẩm nào. Hãy bấm <strong>Thêm sản phẩm</strong> để tạo mới.
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model)
+                        {
+                            var giaGoc = item.GiaGoc ?? 0;
+                            var giaBan = item.GiaBan ?? 0;
+                            bool hasSale = giaBan < giaGoc && giaGoc > 0;
+                            int salePercent = hasSale
+                            ? (int)Math.Round(100.0 * (giaGoc - giaBan) / giaGoc)
+                            : 0;
+
+                            <tr>
+                                <td>
+                                    @{
+                                        var imgFile = string.IsNullOrEmpty(item.HinhAnh)
+                                        ? "no-image.png"          
+                                        : item.HinhAnh;
+
+                                        var imgPath = Url.Content("~/images/products/" + imgFile);
+                                    }
+
+                                    <img src="@imgPath"
+                                         class="rounded"
+                                         style="width:56px;height:56px;object-fit:cover"
+                                         alt="@item.Ten" />
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">@item.Ten</div>
+                                    <div class="small text-muted">
+                                        Mã SP: @item.MaMh
+                                    </div>
+                                </td>
+                                <td class="text-end small text-muted">
+                                    @String.Format("{0:N0} đ", giaGoc)
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-semibold text-danger">
+                                        @String.Format("{0:N0} đ", giaBan)
+                                    </span>
+                                    @if (hasSale && salePercent > 0)
+                                    {
+                                        <span class="badge bg-danger-subtle text-danger border ms-1">
+                                            -@salePercent%
+                                        </span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    @item.SoLuong
+                                </td>
+                                <td>
+                                    @item.MaDmNavigation?.Ten
+                                </td>
+                                <td class="text-center small">
+                                    @item.LuotXem
+                                </td>
+                                <td class="text-center small">
+                                    @item.LuotMua
+                                </td>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Edit" asp-route-id="@item.MaMh"
+                                           class="btn btn-outline-secondary">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-action="Details" asp-route-id="@item.MaMh"
+                                           class="btn btn-outline-info">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.MaMh"
+                                           class="btn btn-outline-danger">
+                                            <i class="bi bi-trash3"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

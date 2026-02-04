@@ -1,0 +1,22 @@
+﻿@model IEnumerable<shop.Models.Mathang>
+@{
+    ViewData["Title"] = "Sản phẩm theo danh mục";
+}
+<h3 class="text-info">@ViewData["Title"]</h3>
+
+<div class="row g-3">
+    @foreach (var p in Model)
+    {
+        <div class="col-md-3">
+            <div class="card h-100">
+                <img class="card-img-top" src="@p.HinhAnh" alt="@p.Ten" />
+                <div class="card-body">
+                    <h6 class="card-title">@p.Ten</h6>
+                    <div>@String.Format("{0:N0} đ", p.GiaBan)</div>
+                    <a class="btn btn-sm btn-primary mt-2"
+                       asp-action="Details" asp-route-id="@p.MaMh">Xem</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

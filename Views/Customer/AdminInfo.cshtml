@@ -1,0 +1,29 @@
+﻿@model shop.Models.Nhanvien
+@{
+    ViewData["Title"] = "Hồ sơ quản lý";
+}
+
+<div class="row my-4">
+    <div class="col-md-6 offset-md-3">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Hồ sơ quản lý</h5>
+            </div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Họ tên</dt>
+                    <dd class="col-sm-8">@Model.Ten</dd>
+
+                    <dt class="col-sm-4">Email</dt>
+                    <dd class="col-sm-8">@Model.Email</dd>
+
+                    <dt class="col-sm-4">Điện thoại</dt>
+                    <dd class="col-sm-8">@Model.DienThoai</dd>
+
+                    <dt class="col-sm-4">Chức vụ</dt>
+                    <dd class="col-sm-8">@Model.MaCvNavigation?.Ten</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
